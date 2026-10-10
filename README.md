@@ -57,8 +57,8 @@ To receive real Vaani calls locally, expose port 3000 with `cloudflared tunnel -
 
 1. Import this repository at vercel.com/new.
 2. In Supabase, create a project and run `supabase/schema.sql` in the SQL Editor. Row Level Security is on with no policies, so only the server key can read or write.
-3. In Project Settings, Environment Variables, add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (Supabase, Project Settings, API; the service_role key is secret and server-only), plus `LLM_API_KEY`, `LLM_PROVIDER`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `WEBHOOK_SECRET`, `DASHBOARD_PASSWORD`, and optionally `GEMINI_MODEL`, `PRICE_IN_PER_M`, `PRICE_OUT_PER_M`. Use fresh values, not ones you have pasted anywhere.
-4. Redeploy. The dashboard is at `/` and asks for the password (any username). The webhook is `https://<project>.vercel.app/webhook/<WEBHOOK_SECRET>`; paste it into Vaani.
+3. In Project Settings, Environment Variables, add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (Supabase, Project Settings, API; the service_role key is secret and server-only), plus `LLM_API_KEY`, `LLM_PROVIDER`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `WEBHOOK_SECRET`, optionally `DASHBOARD_PASSWORD` (leave it out for an open dashboard), and optionally `GEMINI_MODEL`, `PRICE_IN_PER_M`, `PRICE_OUT_PER_M`. Use fresh values, not ones you have pasted anywhere.
+4. Redeploy. The dashboard is at `/`; it asks for the password (any username) only if `DASHBOARD_PASSWORD` is set. The webhook is `https://<project>.vercel.app/webhook/<WEBHOOK_SECRET>`; paste it into Vaani.
 5. Optional, to fill the dashboard with the 20 demo calls: set the two Supabase variables in your local `.env` and run `npm run demo -- --no-telegram`.
 
 ## Costs
@@ -68,5 +68,5 @@ Voice is about 98% of the running cost (estimated at 5.6 rupees a minute from th
 ## Security notes
 
 - Vaani webhooks carry no signature, so the endpoint is protected by a secret in the URL. Treat that URL like a password and rotate the secret if it leaks.
-- The dashboard holds caller names and numbers and is behind HTTP Basic auth. It fails closed if `DASHBOARD_PASSWORD` is not set.
+- The dashboard shows caller names, details and handoff notes. Login is optional: if `DASHBOARD_PASSWORD` is set it asks for it (any username); if it is not set the dashboard is **public**, so anyone with the URL sees every call. Set the variable to protect real caller data.
 - `data/calls.json` holds the 20 anonymised September transcripts supplied with the case. Live call logs are git-ignored.
