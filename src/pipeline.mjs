@@ -2,6 +2,7 @@
 import { qualify } from './qualify.mjs';
 import { formatNote, sendTelegram, NOTIFY } from './telegram.mjs';
 import { appendEntry, readLog } from './store.mjs';
+import { hubspotEnabled, syncCall } from './hubspot.mjs';
 
 export { readLog };
 
@@ -11,7 +12,7 @@ export function durationFromHeader(h = '') {
   return m ? Number(m[1]) * 60 + Number(m[2] || 0) : null;
 }
 
-export async function processCall({ id, header = '', transcript, receivedAt = new Date(), durationSec = null, notify = true }) {
+export async function processCall({ id, header = '', transcript, receivedAt = new Date(), durationSec = null, notify = true, crm = true }) {
   const t0 = Date.now();
   const { result, usage } = await qualify({ header, transcript });
   let telegram = 'not_needed', messageId = null, error = null;
@@ -32,6 +33,8 @@ export async function processCall({ id, header = '', transcript, receivedAt = ne
     reply_to_caller: result.reply_to_caller, next_action: result.next_action,
     usage, telegram, messageId, error,
   };
+  // CRM sync is best-effort: a HubSpot problem is recorded on the call, never thrown
+  if (crm && hubspotEnabled()) entry.hubspot = await syncCall(entry);
   await appendEntry(entry);
   return entry;
 }

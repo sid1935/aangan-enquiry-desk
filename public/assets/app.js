@@ -80,12 +80,13 @@ const displayId = c => (c.demo ? c.id : '#' + (c.id.split('-').pop() || c.id).sl
 const outTag = (k, short) => `<span class="tag t-${k}"><i></i>${icon(OUTCOMES[k].icon)}${esc(short ? OUTCOMES[k].short : OUTCOMES[k].label)}</span>`;
 
 // ---------- data ----------
-let CALLS = [];
+let CALLS = [], CONFIG = {};
 async function loadData() {
   const res = await fetch('/api/data', { cache: 'no-store' });
   if (res.status === 401) throw new Error('auth');
   if (!res.ok) throw new Error('http ' + res.status);
-  CALLS = (await res.json()).calls.map(decorate).sort((a, b) => b.sortKey - a.sortKey);
+  const j = await res.json(); CONFIG = j.config || {};
+  CALLS = j.calls.map(decorate).sort((a, b) => b.sortKey - a.sortKey);
 }
 
 // ---------- shell ----------
@@ -159,7 +160,7 @@ function overview() {
 function rowHTML(c, compact) {
   const w = who(c);
   const fl = (c.flags || []).filter(x => x !== 'after_hours').map(x => `<span class="flag">${esc(FLAGS[x] || x)}</span>`).join('');
-  const hand = c.telegram === 'sent' ? 'Telegram ✓' : c.telegram === 'not_needed' ? 'Logged only' : esc(c.telegram || '');
+  const hand = (c.telegram === 'sent' ? 'Telegram ✓' : c.telegram === 'not_needed' ? 'Logged only' : esc(c.telegram || '')) + (c.hubspot?.ok ? '<br>HubSpot ✓' : '');
   const src = c.demo ? '' : '<span class="src live">Live</span>';
   const mob = `<div class="mob"><b>${esc(displayId(c))}</b>${outTag(c.decision, true)}<span class="when">${esc(c.whenLabel)}</span>${src}</div>`;
   const whoHTML = `<div class="who">${w.name ? `<b>${esc(w.name)}</b>` : ''}<div>${esc(w.detail)}</div></div>`;
@@ -218,6 +219,15 @@ function drawList() {
 }
 
 // ---------- CALL DETAIL ----------
+function hubspotHTML(c) {
+  const h = c.hubspot, p = CONFIG.hubspotPortalId;
+  if (!h) return '<span class="nil">Not synced</span>';
+  if (!h.ok) return '<span class="pill p-fail">' + icon('x') + 'Sync failed</span> <span class="nil">will retry</span>';
+  const rec = (label, id, type) => p
+    ? `<a class="ext" href="https://app.hubspot.com/contacts/${encodeURIComponent(p)}/record/${type}/${encodeURIComponent(id)}" target="_blank" rel="noopener">${label}</a>`
+    : `${label} #${esc(id)}`;
+  return [rec('Contact', h.contactId, '0-1'), h.dealId ? rec('Deal', h.dealId, '0-3') : '', h.taskId ? 'Task created' : ''].filter(Boolean).join(' · ');
+}
 function call() {
   const id = qs().get('id');
   const i = CALLS.findIndex(c => c.id === id);
@@ -250,7 +260,7 @@ function call() {
         <div class="card"><div class="lbl">The five checks</div><div class="checks">${CHECKS.map(([k, l]) => `<div class="check"><span>${l}</span>${pill((c.criteria || {})[k])}</div>`).join('')}</div>
           ${(c.flags || []).length ? `<div style="margin-top:12px">${c.flags.map(f => `<span class="flag">${esc(FLAGS[f] || f)}</span>`).join('')}</div>` : ''}</div>
         <div class="card"><div class="lbl">Delivery and cost</div><dl class="kv">
-          <dt>Hand-off</dt><dd>${delivery}</dd><dt>Voice minutes</dt><dd>${fmtDur(c.callDurationSec)}</dd>
+          <dt>Hand-off</dt><dd>${delivery}</dd><dt>HubSpot</dt><dd>${hubspotHTML(c)}</dd><dt>Voice minutes</dt><dd>${fmtDur(c.callDurationSec)}</dd>
           <dt>AI tokens</dt><dd>${((c.usage?.tokensIn || 0) + (c.usage?.tokensOut || 0)).toLocaleString('en-IN')}</dd><dt>Est. cost</dt><dd>${inr(inrCost)}</dd></dl></div>
       </div>
     </div>

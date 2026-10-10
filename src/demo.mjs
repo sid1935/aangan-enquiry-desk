@@ -17,7 +17,7 @@ const expected = JSON.parse(fs.readFileSync('data/expected.json', 'utf8'));
 if (!only.length) await resetLog();
 let sent = 0;
 for (const c of calls) {
-  const e = await processCall({ id: c.id, header: c.header, transcript: c.transcript, notify });
+  const e = await processCall({ id: c.id, header: c.header, transcript: c.transcript, notify, crm: false });
   if (e.telegram === 'sent') sent++;
   console.log(`${e.decision === expected[c.id] ? 'OK  ' : 'DIFF'} ${c.id} ${e.decision.padEnd(15)} telegram=${e.telegram}${e.error ? ' ERR ' + e.error : ''}`);
   await new Promise(r => setTimeout(r, notify ? 1200 : 0)); // stay clear of Telegram rate limits

@@ -17,7 +17,7 @@ http.createServer(async (req, res) => {
   const { pathname } = new URL(req.url, 'http://localhost');
   if (pathname === '/api/data') {
     res.writeHead(200, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
-    return res.end(JSON.stringify({ calls: await readLog(), generatedAt: new Date().toISOString() }));
+    return res.end(JSON.stringify({ calls: await readLog(), config: { hubspotPortalId: process.env.HUBSPOT_PORTAL_ID || null }, generatedAt: new Date().toISOString() }));
   }
   const rel = PAGES[pathname] || (pathname.startsWith('/assets/') ? pathname.slice(1) : null);
   const file = rel && path.join(pub, rel);

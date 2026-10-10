@@ -63,6 +63,18 @@ To receive real Vaani calls locally, expose port 3000 with `cloudflared tunnel -
 4. Redeploy. The dashboard pages are static files in `public/`; `/api/data` asks for the password (any username) only if `DASHBOARD_PASSWORD` is set. The webhook is `https://<project>.vercel.app/webhook/<WEBHOOK_SECRET>`; paste it into Vaani.
 5. Optional, to fill the dashboard with the 20 demo calls: set the two Supabase variables in your local `.env` and run `npm run demo -- --no-telegram`.
 
+## HubSpot CRM (optional)
+
+Set `HUBSPOT_TOKEN` (a HubSpot Private App access token) and every processed call is also written to HubSpot:
+
+| Outcome | Created in HubSpot |
+|---|---|
+| Forwarded | Contact, Deal (first stage of the default pipeline) and a Note with the handoff details |
+| Escalated, callback needed | Contact, a Task (high priority, due in 15 minutes for escalations, 2 hours for callbacks) and a Note |
+| Declined, nurture | Contact and a Note, with lead status Unqualified or Bad timing |
+
+A HubSpot error never blocks a call or its Telegram note. It is recorded on the call (the call page shows "Sync failed") and retried by `npm run hubspot:sync`, which also back-fills calls that are not in HubSpot yet. Re-running it never duplicates records. Contacts are matched by phone number when the caller gave one. `npm run demo` never writes to HubSpot. Token scopes needed: contacts, deals, tasks and notes (read and write).
+
 ## Costs
 
 Voice is about 98% of the running cost (estimated at 5.6 rupees a minute from the Vaani agent page); Gemini is a rounding error. At 200 enquiries a month the projection is roughly 5,000 rupees, against projects worth 8-14 lakh. The dashboard has editable assumptions for the voice rate, number cost, volume and conversion. The conversion figure is a placeholder, and the project-value break-even line is the one to rely on.

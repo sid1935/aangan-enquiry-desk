@@ -13,7 +13,8 @@
     "demo": "node src/demo.mjs",
     "webhook": "node src/server.mjs",
     "dashboard": "node src/dashboard.mjs",
-    "seed": "node src/seed-from-log.mjs"
+    "seed": "node src/seed-from-log.mjs",
+    "hubspot:sync": "node src/hubspot-sync.mjs"
   },
   "dependencies": {
     "@vercel/functions": "^3.9.11"
