@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    { "source": "/webhook/:secret", "destination": "/api/webhook?secret=:secret" },
+    { "source": "/", "destination": "/api/dashboard" }
+  ],
+  "functions": {
+    "api/webhook.mjs": { "maxDuration": 60, "includeFiles": "knowledge/**" },
+    "api/dashboard.mjs": { "includeFiles": "views/**" }
+  }
+}

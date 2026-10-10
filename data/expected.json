@@ -1,0 +1,6 @@
+{
+  "T01": "forward", "T02": "forward", "T03": "decline", "T04": "decline", "T05": "forward",
+  "T06": "forward", "T07": "nurture", "T08": "callback_needed", "T09": "escalate", "T10": "decline",
+  "T11": "forward", "T12": "forward", "T13": "forward", "T14": "forward", "T15": "forward",
+  "T16": "forward", "T17": "forward", "T18": "decline", "T19": "decline", "T20": "forward"
+}

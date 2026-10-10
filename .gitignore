@@ -1,0 +1,23 @@
+# secrets
+.env
+.env.*
+!.env.example
+
+# dependencies
+node_modules/
+
+# live / local call data (contains caller details)
+data/log.jsonl
+data/webhook-raw.jsonl
+data/results.json
+data/*.out
+data/*.err
+
+# coursework file and Office lock files
+*.docx
+~$*
+
+# misc
+__pycache__/
+*.pyc
+.vercel/

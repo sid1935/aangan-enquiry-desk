@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aangan Enquiry Desk</title>
+<style>
+  :root {
+    --bg:#f6f5f2; --card:#ffffff; --ink:#1c1b19; --mute:#6b6862; --line:#e4e1da;
+    --accent:#2f5d50; --good:#2f7d4f; --warn:#b7791f; --bad:#b83a3a; --info:#3b6aa0; --soft:#eef3f0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#161715; --card:#1f201e; --ink:#ecebe7; --mute:#a09d95; --line:#33342f;
+      --accent:#6fb59f; --good:#58b27a; --warn:#d9a441; --bad:#e07070; --info:#7aa7d6; --soft:#262b28;
+    }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  .wrap { max-width:1180px; margin:0 auto; padding:24px 16px 56px; }
+  header { display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; align-items:baseline; margin-bottom:20px; }
+  h1 { font-size:22px; margin:0; letter-spacing:-.01em; }
+  .sub { color:var(--mute); font-size:13px; }
+  h2 { font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--mute); margin:28px 0 10px; font-weight:600; }
+  .grid { display:grid; gap:12px; }
+  .kpis { grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  .kpi .v { font-size:30px; font-weight:650; letter-spacing:-.02em; }
+  .kpi .l { color:var(--mute); font-size:13px; }
+  .kpi .n { color:var(--mute); font-size:12px; margin-top:4px; }
+  .two { grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); }
+  .bar { display:flex; height:14px; border-radius:7px; overflow:hidden; background:var(--line); margin:10px 0 12px; }
+  .bar span { display:block; }
+  .legend { display:flex; flex-wrap:wrap; gap:6px 16px; font-size:13px; }
+  .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th { text-align:left; color:var(--mute); font-weight:600; font-size:12px; padding:8px 8px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  td { padding:8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  tr:last-child td { border-bottom:0; }
+  .tablewrap { overflow-x:auto; }
+  .tag { display:inline-block; padding:1px 8px; border-radius:999px; font-size:12px; font-weight:600; border:1px solid currentColor; white-space:nowrap; }
+  .t-forward{color:var(--good)} .t-decline{color:var(--mute)} .t-escalate{color:var(--bad)} .t-nurture{color:var(--info)} .t-callback_needed{color:var(--warn)}
+  .flag { display:inline-block; font-size:11.5px; color:var(--mute); background:var(--soft); border-radius:6px; padding:1px 6px; margin:0 4px 2px 0; }
+  .row { display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-bottom:1px dashed var(--line); font-size:14px; }
+  .row:last-child { border-bottom:0; }
+  .row b { font-variant-numeric:tabular-nums; }
+  .total { font-weight:650; border-top:1px solid var(--line); margin-top:6px; padding-top:8px; }
+  label { display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:13.5px; padding:4px 0; }
+  input[type=number] { width:110px; padding:5px 8px; border:1px solid var(--line); border-radius:7px; background:var(--bg); color:var(--ink); font:inherit; text-align:right; }
+  .note { color:var(--mute); font-size:12.5px; margin-top:8px; }
+  .attn { border-left:4px solid var(--bad); padding:8px 12px; margin:8px 0; background:var(--soft); border-radius:0 8px 8px 0; font-size:14px; }
+  .attn.cb { border-left-color:var(--warn); }
+  select { padding:5px 8px; border:1px solid var(--line); border-radius:7px; background:var(--card); color:var(--ink); font:inherit; }
+  .empty { color:var(--mute); padding:20px; text-align:center; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Aangan Enquiry Desk</h1>
+      <div class="sub">Phone enquiries: what the system handled, what it generated, what it costs</div>
+    </div>
+    <div class="sub" id="stamp"></div>
+  </header>
+
+  <div class="grid kpis" id="kpis"></div>
+
+  <h2>Needs a human now</h2>
+  <div id="attention"></div>
+
+  <h2>Outcomes</h2>
+  <div class="card">
+    <div class="bar" id="outbar"></div>
+    <div class="legend" id="outlegend"></div>
+  </div>
+
+  <h2>Cost and value</h2>
+  <div class="grid two">
+    <div class="card">
+      <div style="font-weight:600;margin-bottom:6px">What the tool costs</div>
+      <div id="costs"></div>
+      <div class="note" id="costnote"></div>
+    </div>
+    <div class="card">
+      <div style="font-weight:600;margin-bottom:6px">Assumptions (edit these)</div>
+      <div id="assump"></div>
+      <div class="note">Saved in this browser only. Voice rate and number cost come from your Vaani billing page; they are not available through Vaani's API.</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px">
+    <div style="font-weight:600;margin-bottom:6px">Is it worth it?</div>
+    <div id="roi"></div>
+  </div>
+
+  <h2>All calls</h2>
+  <div class="card">
+    <div style="margin-bottom:10px">
+      <label style="justify-content:flex-start">Show
+        <select id="filter">
+          <option value="all">all calls</option><option value="forward">forwarded</option>
+          <option value="decline">declined</option><option value="nurture">nurture</option>
+          <option value="escalate">escalated</option><option value="callback_needed">callbacks</option>
+        </select>
+      </label>
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Call</th><th>When</th><th>Outcome</th><th>Who / what</th><th>Flags</th><th>Hand-off</th><th>Cost</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+  </div>
+</div>
+
+<script>
+const DEFAULTS = { usdInr: 88, voiceInrPerMin: 5.6, numberInrPerMonth: 0, monthlyVolume: 200, unansweredShare: 48, convPct: 3, projectLakh: 11 };
+const LABEL = { forward:'Forwarded to designer', decline:'Declined politely', nurture:'Nurture', escalate:'Escalated', callback_needed:'Callback needed' };
+const COLOR = { forward:'var(--good)', decline:'var(--mute)', nurture:'var(--info)', escalate:'var(--bad)', callback_needed:'var(--warn)' };
+const FLAGTXT = { pricing_asked:'asked price', complaint:'complaint', repeat_caller:'repeat caller', proxy_caller:'for someone else', budget_mismatch:'budget mismatch', dropped_call:'dropped call', after_hours:'after hours', referral:'referral', timeline_tight:'tight timeline', large_project:'large project' };
+
+let A = { ...DEFAULTS };
+try { A = { ...DEFAULTS, ...JSON.parse(localStorage.getItem('aangan-assump') || '{}') }; } catch {}
+let DATA = [];
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const inr = n => '₹' + (n >= 100 ? Math.round(n).toLocaleString('en-IN') : n.toFixed(2));
+const lakh = n => '₹' + (n / 1e5).toFixed(1) + ' lakh';
+const med = a => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); const m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+
+// After hours = outside 10am-7pm. Demo calls carry the time in the header; live calls use receivedAt in IST.
+function hourOf(c) {
+  const m = (c.header || '').match(/(\d{1,2}):(\d{2})\s*(am|pm)/i);
+  if (m) { let h = Number(m[1]) % 12; if (/pm/i.test(m[3])) h += 12; return h; }
+  const d = new Date(new Date(c.receivedAt).getTime() + 5.5 * 3600e3);
+  return d.getUTCHours();
+}
+const afterHours = c => c.flags?.includes('after_hours') || hourOf(c) < 10 || hourOf(c) >= 19;
+
+function whoWhat(c) {
+  const e = c.extracted || {};
+  const bits = [e.caller_name, e.project_type, e.location, e.size_sqft ? e.size_sqft + ' sq ft' : null].filter(Boolean);
+  return bits.length ? bits.join(' · ') : (c.reasons?.[0] || '');
+}
+
+function render() {
+  const n = DATA.length;
+  $('stamp').textContent = n ? n + ' calls in the log' : '';
+  if (!n) { $('kpis').innerHTML = '<div class="card empty" style="grid-column:1/-1">No calls logged yet. Run <code>node src/demo.mjs</code> or wait for a Vaani call.</div>'; return; }
+
+  const by = k => DATA.filter(c => c.decision === k);
+  const fwd = by('forward'), esc_ = by('escalate'), cb = by('callback_needed');
+  const after = DATA.filter(afterHours);
+  const times = DATA.map(c => c.processingSec).filter(x => x != null);
+  const sent = DATA.filter(c => c.telegram === 'sent').length;
+
+  $('kpis').innerHTML = [
+    [n, 'Calls handled', 'every call gets an outcome'],
+    [fwd.length, 'Leads sent to designers', Math.round(fwd.length / n * 100) + '% of calls, each with a full note'],
+    [after.length, 'Calls outside 10am–7pm', 'the front desk was off; the system was not'],
+    [med(times) != null ? med(times).toFixed(1) + ' s' : '—', 'Call end to hand-off (median)', sent + ' Telegram notes delivered'],
+  ].map(([v, l, t]) => `<div class="card kpi"><div class="v">${v}</div><div class="l">${l}</div><div class="n">${t}</div></div>`).join('');
+
+  const attn = [...esc_, ...cb];
+  $('attention').innerHTML = attn.length ? attn.map(c => `<div class="attn ${c.decision === 'callback_needed' ? 'cb' : ''}"><b>${esc(c.id)} · ${LABEL[c.decision]}</b><br>${esc(c.handoff_note)}</div>`).join('')
+    : '<div class="card empty">Nothing waiting. All clear.</div>';
+
+  const order = ['forward', 'decline', 'nurture', 'escalate', 'callback_needed'];
+  $('outbar').innerHTML = order.map(k => by(k).length ? `<span style="width:${by(k).length / n * 100}%;background:${COLOR[k]}" title="${LABEL[k]}"></span>` : '').join('');
+  $('outlegend').innerHTML = order.map(k => `<span><i class="dot" style="background:${COLOR[k]}"></i>${LABEL[k]} <b>${by(k).length}</b></span>`).join('');
+
+  // ---- cost ----
+  const llmUsd = DATA.reduce((s, c) => s + (c.usage?.costUsd || 0), 0);
+  const llmInr = llmUsd * A.usdInr;
+  const mins = DATA.reduce((s, c) => s + (c.callDurationSec || 0), 0) / 60;
+  const voiceInr = mins * A.voiceInrPerMin;
+  const perCall = (llmInr + voiceInr) / n;                      // variable cost per enquiry
+  const monthly = perCall * A.monthlyVolume + A.numberInrPerMonth;
+  const perLead = fwd.length ? (llmInr + voiceInr) / fwd.length : null;
+  $('costs').innerHTML =
+    `<div class="row"><span>AI qualification (Gemini), ${n} calls</span><b>${inr(llmInr)}</b></div>` +
+    `<div class="row"><span>Voice agent, ${mins.toFixed(1)} min × ${inr(A.voiceInrPerMin)}/min</span><b>${A.voiceInrPerMin ? inr(voiceInr) : 'rate not set'}</b></div>` +
+    `<div class="row"><span>Cost per enquiry</span><b>${inr(perCall)}</b></div>` +
+    `<div class="row"><span>Cost per lead sent to a designer</span><b>${perLead != null ? inr(perLead) : '—'}</b></div>` +
+    `<div class="row"><span>Phone number (monthly)</span><b>${inr(A.numberInrPerMonth)}</b></div>` +
+    `<div class="row total"><span>Projected monthly cost at ${A.monthlyVolume} enquiries</span><b>${inr(monthly)}</b></div>`;
+  $('costnote').textContent = (A.voiceInrPerMin ? '' : 'Voice-platform cost is not included yet, so these totals are a floor. ') +
+    'Gemini cost uses estimated token prices (set PRICE_IN_PER_M / PRICE_OUT_PER_M in .env).';
+
+  // ---- value ----
+  const recovered = A.monthlyVolume * A.unansweredShare / 100;
+  const value = recovered * (A.convPct / 100) * A.projectLakh * 1e5;
+  const beProjects = monthly / (A.projectLakh * 1e5);
+  $('roi').innerHTML =
+    `<div class="row"><span>Enquiries a month that currently get no reply in 48 hrs (${A.unansweredShare}% of ${A.monthlyVolume})</span><b>${Math.round(recovered)}</b></div>` +
+    `<div class="row"><span>If the system answers them and ${A.convPct}% become projects of ${A.projectLakh} lakh</span><b>${lakh(value)} a month</b></div>` +
+    `<div class="row"><span>Monthly running cost</span><b>${inr(monthly)}</b></div>` +
+    `<div class="row total"><span>Projects needed a month to cover the running cost</span><b>${beProjects < 0.01 ? 'under 0.01' : beProjects.toFixed(2)}</b></div>` +
+    `<div class="note">The last line needs only the project value, not the conversion guess. The ${A.convPct}% conversion is a placeholder: replace it with Nikhil's real rate. The case says a reply within an hour converts at 4× a next-day reply.</div>`;
+
+  // ---- table ----
+  const f = $('filter').value;
+  const rows = DATA.filter(c => f === 'all' || c.decision === f);
+  $('rows').innerHTML = rows.map(c => `<tr>
+    <td><b>${esc(c.id)}</b></td>
+    <td>${esc((c.header || '').split(' - ').slice(2, 4).join(' ') || new Date(c.receivedAt).toLocaleString())}${afterHours(c) ? '<br><span class="flag">after hours</span>' : ''}</td>
+    <td><span class="tag t-${c.decision}">${LABEL[c.decision]}</span></td>
+    <td>${esc(whoWhat(c))}</td>
+    <td>${(c.flags || []).filter(x => x !== 'after_hours').map(x => `<span class="flag">${FLAGTXT[x] || x}</span>`).join('')}</td>
+    <td>${c.telegram === 'sent' ? 'Telegram ✓' : c.telegram === 'not_needed' ? 'logged only' : esc(c.telegram)}</td>
+    <td>${inr(((c.usage?.costUsd || 0) * A.usdInr) + ((c.callDurationSec || 0) / 60) * A.voiceInrPerMin)}</td>
+  </tr>`).join('');
+}
+
+function buildAssumptions() {
+  const defs = [
+    ['usdInr', 'USD → INR rate'], ['voiceInrPerMin', 'Vaani voice cost, ₹ per minute'], ['numberInrPerMonth', 'Phone number, ₹ per month'],
+    ['monthlyVolume', 'Enquiries per month'], ['unansweredShare', 'Unanswered in 48 hrs, %'], ['convPct', 'Conversion of those, % (placeholder)'], ['projectLakh', 'Average project value, lakh'],
+  ];
+  $('assump').innerHTML = defs.map(([k, l]) => `<label>${l}<input type="number" step="any" min="0" data-k="${k}" value="${A[k]}"></label>`).join('');
+  $('assump').addEventListener('input', e => {
+    const k = e.target.dataset.k; if (!k) return;
+    A[k] = Number(e.target.value) || 0;
+    try { localStorage.setItem('aangan-assump', JSON.stringify(A)); } catch {}
+    render();
+  });
+}
+
+async function load() {
+  try { DATA = (await (await fetch('/api/data')).json()).calls; } catch { DATA = []; }
+  render();
+}
+$('filter').addEventListener('change', render);
+buildAssumptions();
+load();
+setInterval(load, 15000);
+</script>
+</body>
+</html>
