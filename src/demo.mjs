@@ -1,6 +1,6 @@
 // Pushes all 20 September phone transcripts through the full pipeline. Resets the call log first.
 // Usage: node src/demo.mjs [--no-telegram] [T01 T05 ...]
-// With UPSTASH_REDIS_REST_URL / _TOKEN set it fills the Redis log (the deployed dashboard); otherwise data/log.jsonl.
+// With SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY set it fills the Supabase log (the deployed dashboard); otherwise data/log.jsonl.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

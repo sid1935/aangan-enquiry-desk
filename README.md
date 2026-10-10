@@ -17,7 +17,7 @@ Caller -> Vaani voice agent -> call_postprocessing webhook -> Gemini qualificati
 | Webhook | `api/webhook.mjs` (Vercel) or `src/server.mjs` (local) | Receives the transcript after each call |
 | Brain | `src/qualify.mjs` | Gemini reads the transcript with `services.md` and `qualified.md`, returns decision, extracted fields, flags and a handoff note |
 | Handoff | `src/telegram.mjs` | Pushes leads, escalations and missed calls to Telegram. Declines are logged, not pushed |
-| Log | `src/store.mjs` | Upstash Redis on Vercel, a local file otherwise |
+| Log | `src/store.mjs` | Supabase (Postgres) on Vercel, a local file otherwise. Tables in `supabase/schema.sql` |
 | Dashboard | `views/dashboard.html` | Calls handled, outcomes, hand-off time, cost per enquiry, break-even |
 
 Decisions: `forward`, `decline`, `nurture`, `escalate`, `callback_needed`.
@@ -56,10 +56,10 @@ To receive real Vaani calls locally, expose port 3000 with `cloudflared tunnel -
 ## Deploy on Vercel
 
 1. Import this repository at vercel.com/new.
-2. Add **Upstash Redis** from the Vercel Marketplace (Storage tab) and connect it to the project. It sets the Redis variables.
-3. In Project Settings, Environment Variables, add `LLM_API_KEY`, `LLM_PROVIDER`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `WEBHOOK_SECRET`, `DASHBOARD_PASSWORD`, and optionally `GEMINI_MODEL`, `PRICE_IN_PER_M`, `PRICE_OUT_PER_M`. Use fresh values, not ones you have pasted anywhere.
+2. In Supabase, create a project and run `supabase/schema.sql` in the SQL Editor. Row Level Security is on with no policies, so only the server key can read or write.
+3. In Project Settings, Environment Variables, add `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (Supabase, Project Settings, API; the service_role key is secret and server-only), plus `LLM_API_KEY`, `LLM_PROVIDER`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `WEBHOOK_SECRET`, `DASHBOARD_PASSWORD`, and optionally `GEMINI_MODEL`, `PRICE_IN_PER_M`, `PRICE_OUT_PER_M`. Use fresh values, not ones you have pasted anywhere.
 4. Redeploy. The dashboard is at `/` and asks for the password (any username). The webhook is `https://<project>.vercel.app/webhook/<WEBHOOK_SECRET>`; paste it into Vaani.
-5. Optional, to fill the dashboard with the 20 demo calls: set the Redis variables in your local `.env` and run `npm run demo -- --no-telegram`.
+5. Optional, to fill the dashboard with the 20 demo calls: set the two Supabase variables in your local `.env` and run `npm run demo -- --no-telegram`.
 
 ## Costs
 
