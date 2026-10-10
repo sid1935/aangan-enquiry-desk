@@ -4,13 +4,16 @@
   "private": true,
   "type": "module",
   "description": "AI phone-enquiry desk for Aangan Studio: Vaani voice agent, Gemini qualification, Telegram handoff, cost dashboard.",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "extract": "node src/extract.mjs",
     "test:calls": "node src/run_tests.mjs",
     "demo": "node src/demo.mjs",
     "webhook": "node src/server.mjs",
-    "dashboard": "node src/dashboard.mjs"
+    "dashboard": "node src/dashboard.mjs",
+    "seed": "node src/seed-from-log.mjs"
   },
   "dependencies": {
     "@vercel/functions": "^3.9.11"
