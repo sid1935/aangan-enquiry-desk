@@ -2,6 +2,8 @@
 
 Every phone enquiry to Aangan Studio (interior design, Pune) gets answered, qualified against the founder's own rubric, and handed to a designer with the details already collected. Built for MESA AI Case 3, "Nikhil: Unanswered Enquiries".
 
+**Live dashboard:** https://aangan-enquiry-desk-three.vercel.app (open, no login; it shows whatever calls have been logged, including caller details)
+
 **The problem:** about 200 enquiries a month, roughly half unanswered within 48 hours, a third arriving outside desk hours, and an enquiry answered within an hour converting at four times the rate of a next-day reply.
 
 ## How it works
