@@ -58,6 +58,13 @@ export async function readLog() {
   return fs.readFileSync(LOG_FILE, 'utf8').split('\n').filter(Boolean).map(l => JSON.parse(l));
 }
 
+// Connectivity check for /api/health: can we reach the database and do both tables exist?
+export async function ping() {
+  if (backend() !== 'supabase') return { backend: 'file', db: 'n/a' };
+  try { await sb('GET', 'calls?select=id&limit=1'); await sb('GET', 'seen?select=id&limit=1'); return { backend: 'supabase', db: 'ok' }; }
+  catch { return { backend: 'supabase', db: 'error' }; }
+}
+
 export async function resetLog() {
   if (backend() === 'supabase') {
     await sb('DELETE', 'calls?id=not.is.null');
