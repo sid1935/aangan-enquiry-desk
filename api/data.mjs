@@ -6,5 +6,5 @@ export default async function handler(req, res) {
   if (!dashboardAuthorised(req)) return challenge(res);
   res.setHeader('Content-Type', 'application/json');
   res.setHeader('Cache-Control', 'no-store');
-  res.end(JSON.stringify({ calls: await readLog(), config: { hubspotPortalId: process.env.HUBSPOT_PORTAL_ID || null }, generatedAt: new Date().toISOString() }));
+  res.end(JSON.stringify({ calls: await readLog(), config: { hubspotPortalId: process.env.HUBSPOT_PORTAL_ID || null, hubspotUiDomain: process.env.HUBSPOT_UI_DOMAIN || null }, generatedAt: new Date().toISOString() }));
 }

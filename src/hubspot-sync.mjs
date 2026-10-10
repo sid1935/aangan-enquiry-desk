@@ -26,4 +26,4 @@ for (const e of todo) {
   await new Promise(r => setTimeout(r, 400)); // stay well inside HubSpot's rate limit
 }
 if (!dry) console.log(`\nDone: ${ok} synced, ${failed} failed.`);
-process.exit(failed ? 1 : 0);
+process.exitCode = failed ? 1 : 0; // not process.exit(): on Windows it can trip a libuv assertion while connections close

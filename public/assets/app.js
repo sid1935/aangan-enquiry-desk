@@ -224,7 +224,7 @@ function hubspotHTML(c) {
   if (!h) return '<span class="nil">Not synced</span>';
   if (!h.ok) return '<span class="pill p-fail">' + icon('x') + 'Sync failed</span> <span class="nil">will retry</span>';
   const rec = (label, id, type) => p
-    ? `<a class="ext" href="https://app.hubspot.com/contacts/${encodeURIComponent(p)}/record/${type}/${encodeURIComponent(id)}" target="_blank" rel="noopener">${label}</a>`
+    ? `<a class="ext" href="https://${encodeURIComponent(CONFIG.hubspotUiDomain || 'app.hubspot.com')}/contacts/${encodeURIComponent(p)}/record/${type}/${encodeURIComponent(id)}" target="_blank" rel="noopener">${label}</a>`
     : `${label} #${esc(id)}`;
   return [rec('Contact', h.contactId, '0-1'), h.dealId ? rec('Deal', h.dealId, '0-3') : '', h.taskId ? 'Task created' : ''].filter(Boolean).join(' · ');
 }
